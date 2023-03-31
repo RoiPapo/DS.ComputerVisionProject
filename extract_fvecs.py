@@ -109,19 +109,17 @@ def generate_efficientnet_feature_vectors(folder_path: str, dest_path: str,
                                                  original_width=480,
                                                  model_input_size=model_input_size)
     feature_vectors_dict = {}
-    with tqdm(total=len(files) // batch_size) as pbar:
-        for idx, (images, image_ids) in enumerate(ds):
-            feature_vectors = feature_extractor(images)
-            for single_im_id, f_vec in zip(image_ids, feature_vectors):
-                feature_vectors_dict[single_im_id.numpy().decode('utf8')] = f_vec.numpy().tolist()
-            pbar.update(1)
-            if idx % 25 == 0:
-                with open(f'{dest_path}.json', 'a') as f:
-                    f.write(json.dumps(feature_vectors_dict, indent=4))
-                    f.write("\u000a")
+    for idx, (images, image_ids) in enumerate(ds):
+        feature_vectors = feature_extractor(images)
+        for single_im_id, f_vec in zip(image_ids, feature_vectors):
+            feature_vectors_dict[single_im_id.numpy().decode('utf8')] = f_vec.numpy().tolist()
+        if idx % 25 == 0:
+            with open(f'{dest_path}.json', 'a') as f:
+                f.write(json.dumps(feature_vectors_dict, indent=4))
+                f.write("\u000a")
 
-                del feature_vectors_dict
-                feature_vectors_dict = {}
+            del feature_vectors_dict
+            feature_vectors_dict = {}
 
     with open(f'{dest_path}.json', 'a') as f:
         f.write(json.dumps(feature_vectors_dict, indent=4))
@@ -149,7 +147,7 @@ def generate_efficientnet_feature_vectors(folder_path: str, dest_path: str,
 def main():
     model_params_dict = {0: 224, 1: 240, 2: 260, 3: 300, 4: 380, 5: 456, 6: 528, 7: 600}
     db_address = '/datashare/APAS/frames'
-    batch_size = 1
+    batch_size = 64
     seed = 100
     videos_folders_path = glob(f'{db_address}/**', recursive=False)
     for model_index, model_input_size in model_params_dict.items():

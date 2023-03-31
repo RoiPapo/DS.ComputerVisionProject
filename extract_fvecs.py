@@ -109,21 +109,23 @@ def generate_efficientnet_feature_vectors(folder_path: str, dest_path: str,
                                                  original_width=480,
                                                  model_input_size=model_input_size)
     feature_vectors_dict = {}
-    for idx, (images, image_ids) in enumerate(ds):
-        feature_vectors = feature_extractor(images)
-        for single_im_id, f_vec in zip(image_ids, feature_vectors):
-            feature_vectors_dict[single_im_id.numpy().decode('utf8')] = f_vec.numpy().tolist()
-        if idx % 25 == 0:
-            with open(f'{dest_path}.json', 'a') as f:
-                f.write(json.dumps(feature_vectors_dict, indent=4))
-                f.write("\u000a")
+    with tqdm(total=len(files) // batch_size) as pbar:
+        for idx, (images, image_ids) in enumerate(ds):
+            feature_vectors = feature_extractor(images)
+            for single_im_id, f_vec in zip(image_ids, feature_vectors):
+                feature_vectors_dict[single_im_id.numpy().decode('utf8')] = f_vec.numpy().tolist()
+            pbar.update(1)
+            # if idx % 25 == 0:
+            #     with open(f'{dest_path}.json', 'a') as f:
+            #         f.write(json.dumps(feature_vectors_dict, indent=4))
+            #         f.write("\u000a")
 
-            del feature_vectors_dict
-            feature_vectors_dict = {}
+            # del feature_vectors_dict
+            # feature_vectors_dict = {}
 
-    with open(f'{dest_path}.json', 'a') as f:
+    with open(f'{dest_path}.json', 'w') as f:
         f.write(json.dumps(feature_vectors_dict, indent=4))
-        f.write("\u000a")
+        # f.write("\u000a")
 
     # # test is address corresponds to the image in the ds
     # (the ds needs to be unbatched in order for the following code to work)
@@ -152,7 +154,8 @@ def main():
     videos_folders_path = glob(f'{db_address}/**', recursive=False)
     for model_index, model_input_size in model_params_dict.items():
         print(f"Starting model: {model_index}")
-        for folder_path in tqdm(videos_folders_path):
+        for idx, folder_path in enumerate(videos_folders_path):
+            print(f"video: {idx}/200")
             folder = folder_path.split('/')[-1]
             dest_path = f'{os.getcwd()}/efficientnet/B{model_index}'
             os.makedirs(dest_path, exist_ok=True)
@@ -162,9 +165,8 @@ def main():
                                                   model_index=model_index,
                                                   model_input_size=model_input_size,
                                                   seed=seed)
-        break
-
 
 
 if __name__ == '__main__':
+    print('hi')
     main()

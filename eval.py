@@ -1,9 +1,9 @@
 #!/usr/bin/python2.7
 # adapted from: https://github.com/colincsl/TemporalConvolutionalNetworks/blob/master/code/metrics.py
-
+print('sfs')
 import numpy as np
 import argparse
-
+# mea!
 
 def read_file(path):
     with open(path, 'r') as f:

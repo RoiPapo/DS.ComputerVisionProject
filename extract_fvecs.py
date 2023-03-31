@@ -151,6 +151,7 @@ def main():
     seed = 100
     videos_folders_path = glob(f'{db_address}/**', recursive=False)
     for model_index, model_input_size in model_params_dict.items():
+        print(f"Starting model: {model_index}")
         for folder_path in tqdm(videos_folders_path):
             folder = folder_path.split('/')[-1]
             dest_path = f'{os.getcwd()}/efficientnet/B{model_index}'
@@ -161,6 +162,8 @@ def main():
                                                   model_index=model_index,
                                                   model_input_size=model_input_size,
                                                   seed=seed)
+        break
+
 
 
 if __name__ == '__main__':

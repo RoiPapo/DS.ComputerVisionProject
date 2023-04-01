@@ -155,6 +155,10 @@ def main():
     for model_index, model_input_size in model_params_dict.items():
         print(f"Starting model: {model_index}")
         for idx, folder_path in enumerate(videos_folders_path):
+            if model_index == 0 and idx < 7:
+                continue
+            if idx == 25:
+                break
             print(f"video: {idx}/200")
             folder = folder_path.split('/')[-1]
             dest_path = f'{os.getcwd()}/efficientnet/B{model_index}'

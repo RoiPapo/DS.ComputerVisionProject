@@ -118,33 +118,35 @@ def generate_efficientnet_feature_vectors(ds: str,
 
 def main():
     model_params_dict = {0: 224, 1: 240, 2: 260, 3: 300, 4: 380, 5: 456, 6: 528, 7: 600}
-    folders = ['P016_balloon1_side', 'P016_balloon1_top', 'P016_balloon2_side', 'P016_balloon2_top']
+    folders = ['P016_balloon1_side', 'P016_balloon1_top', 'P016_balloon2_side', 'P016_balloon2_top', 'P016_tissue1_side', 'P016_tissue1_top', 'P016_tissue2_side', 'P016_tissue2_top', 'P017_balloon1_side', 'P017_balloon1_top', 'P017_balloon2_side', 'P017_balloon2_top', 'P017_tissue1_side', 'P017_tissue1_top', 'P017_tissue2_side', 'P017_tissue2_top', 'P018_balloon1_side', 'P018_balloon1_top', 'P018_balloon2_side', 'P018_balloon2_top', 'P018_tissue1_side', 'P018_tissue1_top', 'P018_tissue2_side', 'P018_tissue2_top', 'P019_balloon1_side', 'P019_balloon1_top', 'P019_balloon2_side', 'P019_balloon2_top', 'P019_tissue1_side', 'P019_tissue1_top', 'P019_tissue2_side', 'P019_tissue2_top', 'P020_balloon1_side', 'P020_balloon1_top', 'P020_balloon2_side', 'P020_balloon2_top', 'P020_tissue1_side', 'P020_tissue1_top', 'P020_tissue2_side', 'P020_tissue2_top', 'P021_balloon1_side', 'P021_balloon1_top', 'P021_balloon2_side', 'P021_balloon2_top', 'P021_tissue1_side', 'P021_tissue1_top', 'P021_tissue2_side', 'P021_tissue2_top', 'P022_balloon1_side', 'P022_balloon1_top', 'P022_balloon2_side', 'P022_balloon2_top', 'P022_tissue1_side', 'P022_tissue1_top', 'P022_tissue2_side', 'P022_tissue2_top', 'P023_balloon1_side', 'P023_balloon1_top', 'P023_balloon2_side', 'P023_balloon2_top', 'P023_tissue1_side', 'P023_tissue1_top', 'P023_tissue2_side', 'P023_tissue2_top', 'P024_balloon1_side', 'P024_balloon1_top', 'P024_balloon2_side', 'P024_balloon2_top', 'P024_tissue1_side', 'P024_tissue1_top', 'P024_tissue2_side', 'P024_tissue2_top', 'P025_balloon1_side', 'P025_balloon1_top', 'P025_balloon2_side', 'P025_balloon2_top', 'P025_tissue1_side', 'P025_tissue1_top', 'P025_tissue2_side', 'P025_tissue2_top', 'P026_balloon1_side', 'P026_balloon1_top', 'P026_balloon2_side', 'P026_balloon2_top', 'P026_tissue1_side', 'P026_tissue1_top', 'P026_tissue2_side', 'P026_tissue2_top', 'P027_balloon1_side', 'P027_balloon1_top', 'P027_balloon2_side', 'P027_balloon2_top', 'P027_tissue1_side', 'P027_tissue1_top', 'P027_tissue2_side', 'P027_tissue2_top', 'P028_balloon1_side', 'P028_balloon1_top', 'P028_balloon2_side', 'P028_balloon2_top', 'P028_tissue1_side', 'P028_tissue1_top', 'P028_tissue2_side', 'P028_tissue2_top', 'P029_balloon1_side', 'P029_balloon1_top', 'P029_balloon2_side', 'P029_balloon2_top', 'P029_tissue1_side', 'P029_tissue1_top', 'P029_tissue2_side', 'P029_tissue2_top', 'P030_balloon1_side', 'P030_balloon1_top', 'P030_balloon2_side', 'P030_balloon2_top', 'P030_tissue1_side', 'P030_tissue1_top', 'P030_tissue2_side', 'P030_tissue2_top', 'P031_balloon1_side', 'P031_balloon1_top', 'P031_balloon2_side', 'P031_balloon2_top', 'P031_tissue1_side', 'P031_tissue1_top', 'P031_tissue2_side', 'P031_tissue2_top', 'P032_balloon1_side', 'P032_balloon1_top', 'P032_balloon2_side', 'P032_balloon2_top', 'P032_tissue1_side', 'P032_tissue1_top', 'P032_tissue2_side', 'P032_tissue2_top', 'P033_balloon1_side', 'P033_balloon1_top', 'P033_balloon2_side', 'P033_balloon2_top', 'P033_tissue1_side', 'P033_tissue1_top', 'P033_tissue2_side', 'P033_tissue2_top', 'P034_balloon1_side', 'P034_balloon1_top', 'P034_balloon2_side', 'P034_balloon2_top', 'P034_tissue1_side', 'P034_tissue1_top', 'P034_tissue2_side', 'P034_tissue2_top', 'P035_balloon1_side', 'P035_balloon1_top', 'P035_balloon2_side', 'P035_balloon2_top', 'P035_tissue1_side', 'P035_tissue1_top', 'P035_tissue2_side', 'P035_tissue2_top', 'P036_balloon1_side', 'P036_balloon1_top', 'P036_balloon2_side', 'P036_balloon2_top', 'P036_tissue1_side', 'P036_tissue1_top', 'P036_tissue2_side', 'P036_tissue2_top', 'P037_balloon1_side', 'P037_balloon1_top', 'P037_balloon2_side', 'P037_balloon2_top', 'P037_tissue1_side', 'P037_tissue1_top', 'P037_tissue2_side', 'P037_tissue2_top', 'P038_balloon1_side', 'P038_balloon1_top', 'P038_balloon2_side', 'P038_balloon2_top', 'P038_tissue1_side', 'P038_tissue1_top', 'P038_tissue2_side', 'P038_tissue2_top', 'P039_balloon1_side', 'P039_balloon1_top', 'P039_balloon2_side', 'P039_balloon2_top', 'P039_tissue1_side', 'P039_tissue1_top', 'P039_tissue2_side', 'P039_tissue2_top', 'P040_balloon1_side', 'P040_balloon1_top', 'P040_balloon2_side', 'P040_balloon2_top', 'P040_tissue1_side', 'P040_tissue1_top', 'P040_tissue2_side', 'P040_tissue2_top']
+
     labels_folder_dict = {i: folders[i] for i in range(len(folders))}
 
-    # db_address = '/datashare/APAS/frames'
-    db_address = '/home/user/datasets/frames'
+    db_address = '/datashare/APAS/frames/'
+    # db_address = '/home/user/datasets/frames'
     batch_size = 64
     seed = 100
     for model_index, model_input_size in model_params_dict.items():
-        print(f"Starting model: {model_index}")
-        ds = tf.keras.utils.image_dataset_from_directory(
-            '/home/user/datasets/frames/',
-            seed=seed,
-            labels='inferred',
-            label_mode='int',
-            class_names=list(labels_folder_dict.values()),
-            shuffle=False,
-            image_size=(model_input_size, model_input_size),
-            batch_size=batch_size)
+        if model_index == 7:
+            print(f"Starting model: {model_index}")
+            ds = tf.keras.utils.image_dataset_from_directory(
+                db_address,
+                seed=seed,
+                labels='inferred',
+                label_mode='int',
+                class_names=list(labels_folder_dict.values()),
+                shuffle=False,
+                image_size=(model_input_size, model_input_size),
+                batch_size=batch_size)
 
-        dest_path = f'{os.getcwd()}/efficientnet/B{model_index}'
-        os.makedirs(dest_path, exist_ok=True)
-        generate_efficientnet_feature_vectors(ds=ds,
-                                              dest_path=dest_path,
-                                              labels_folder_dict=labels_folder_dict,
-                                              model_index=model_index,
-                                              model_input_size=model_input_size,
-                                              batch_size=batch_size)
+            dest_path = f'{os.getcwd()}/efficientnet/B{model_index}'
+            os.makedirs(dest_path, exist_ok=True)
+            generate_efficientnet_feature_vectors(ds=ds,
+                                                  dest_path=dest_path,
+                                                  labels_folder_dict=labels_folder_dict,
+                                                  model_index=model_index,
+                                                  model_input_size=model_input_size,
+                                                  batch_size=batch_size)
 
 
 if __name__ == '__main__':

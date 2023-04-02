@@ -90,7 +90,7 @@ def generate_efficientnet_feature_vectors(ds: str,
     with tqdm(total=len(ds.file_paths) // batch_size) as pbar:
         for idx, (images, image_ids) in enumerate(ds):
             print('here')
-            if image_ids[0][0]==100:
+            if image_ids[0][0] == 100:
                 return
             feature_vectors = feature_extractor(images)
             for inner_idx, (single_im_id, f_vec) in enumerate(zip(image_ids, feature_vectors)):
@@ -190,10 +190,9 @@ def main():
                                                   labels_folder_dict=labels_folder_dict,
                                                   model_index=model_index,
                                                   model_input_size=model_input_size,
-                                                  batch_size=batch_size,
-                                                  label_to_exclude=classes_index_not_to_load)
+                                                  batch_size=batch_size)
 
 
 if __name__ == '__main__':
-    print("updated 3")
+    print("updated 4")
     main()

@@ -3,6 +3,9 @@ from tqdm import tqdm
 import os
 import tensorflow as tf
 from tensorflow import keras
+from tensorflow.python.framework.ops import disable_eager_execution
+
+disable_eager_execution()
 
 
 def chose_model(model_type):
@@ -84,31 +87,61 @@ def generate_efficientnet_feature_vectors(ds: str,
       :return: None
       """
 
+    # feature_extractor = build_model_EfficientNet(model_index, model_input_size=model_input_size)
+    # out_feature_vectors = None
+    # processed_labels = []
+    # with tqdm(total=len(ds.file_paths) // batch_size) as pbar:
+    #     for idx, (images, image_ids) in enumerate(ds):
+    #         if image_ids[-1].numpy() == 100:
+    #             return
+    #         feature_vectors = feature_extractor(images)
+    #         for inner_idx, (single_im_id, f_vec) in enumerate(zip(image_ids, feature_vectors)):
+    #             video_name = ds.class_names[single_im_id]
+    #             frame_name = ds.file_paths[idx * batch_size + inner_idx].split('/')[-1]
+    #             if video_name not in processed_labels:
+    #                 if out_feature_vectors is not None:
+    #                     np.save(f'{dest_path}/{video_name}.npy', out_feature_vectors.T)
+    #                 out_feature_vectors = f_vec.numpy()
+    #                 processed_labels.append(video_name)
+    #
+    #             else:
+    #                 out_feature_vectors = np.vstack([out_feature_vectors, f_vec.numpy()])
+    #
+    #         pbar.update(1)
+    #
+    #     np.save(f'{dest_path}/{video_name}.npy', out_feature_vectors.T)
+
     feature_extractor = build_model_EfficientNet(model_index, model_input_size=model_input_size)
     out_feature_vectors = None
     processed_labels = []
+    iterator = tf.compat.v1.data.make_one_shot_iterator(ds)
+    idx = 0
     with tqdm(total=len(ds.file_paths) // batch_size) as pbar:
-        for idx, (images, image_ids) in enumerate(ds):
-            print('here')
-            print(image_ids[-1])
-            if image_ids[-1] == 100:
-                return
-            feature_vectors = feature_extractor(images)
-            for inner_idx, (single_im_id, f_vec) in enumerate(zip(image_ids, feature_vectors)):
-                video_name = ds.class_names[single_im_id]
-                frame_name = ds.file_paths[idx * batch_size + inner_idx].split('/')[-1]
-                if video_name not in processed_labels:
-                    if out_feature_vectors is not None:
-                        np.save(f'{dest_path}/{video_name}.npy', out_feature_vectors.T)
-                    out_feature_vectors = f_vec.numpy()
-                    processed_labels.append(video_name)
+        with tf.compat.v1.Session() as sess:
+            while True:
+                try:
+                    batch = sess.run(iterator.get_next())
+                    print(batch)
+                    images, image_ids = batch
+                    if image_ids[-1] == 100:
+                        return
+                    feature_vectors = feature_extractor(images)
+                    for inner_idx, (single_im_id, f_vec) in enumerate(zip(image_ids, feature_vectors)):
+                        video_name = ds.class_names[single_im_id]
+                        frame_name = ds.file_paths[idx * batch_size + inner_idx].split('/')[-1]
+                        if video_name not in processed_labels:
+                            if out_feature_vectors is not None:
+                                np.save(f'{dest_path}/{video_name}.npy', out_feature_vectors.T)
+                            out_feature_vectors = f_vec.numpy()
+                            processed_labels.append(video_name)
 
-                else:
-                    out_feature_vectors = np.vstack([out_feature_vectors, f_vec.numpy()])
+                        else:
+                            out_feature_vectors = np.vstack([out_feature_vectors, f_vec.numpy()])
 
-            pbar.update(1)
-
-        np.save(f'{dest_path}/{video_name}.npy', out_feature_vectors.T)
+                    pbar.update(1)
+                    idx += 1
+                except tf.errors.OutOfRangeError:
+                    break
 
 
 def main():
@@ -155,6 +188,8 @@ def main():
                'P039_balloon2_top', 'P039_tissue1_side', 'P039_tissue1_top', 'P039_tissue2_side', 'P039_tissue2_top',
                'P040_balloon1_side', 'P040_balloon1_top', 'P040_balloon2_side', 'P040_balloon2_top',
                'P040_tissue1_side', 'P040_tissue1_top', 'P040_tissue2_side', 'P040_tissue2_top']
+    # folders = ['P016_balloon1_side', 'P016_balloon1_top', 'P016_balloon2_side', 'P016_balloon2_top']
+
     side_folders = []
     up_folders = []
     for fo in folders:
@@ -162,14 +197,17 @@ def main():
             side_folders.append(fo)
         elif 'top' in fo:
             up_folders.append(fo)
+
+    print(side_folders)
+    exit()
     ordered_folders = side_folders + up_folders
     classes_index_not_to_load = []
 
     labels_folder_dict = {i: folders[i] for i in range(len(ordered_folders))}
 
-    db_address = '/datashare/APAS/frames/'
-    # db_address = '/home/user/datasets/frames'
-    batch_size = 64
+    # db_address = '/datashare/APAS/frames/'
+    db_address = '/home/user/datasets/frames'
+    batch_size = 256
     seed = 100
     for model_index, model_input_size in model_params_dict.items():
         if model_index == 0:

@@ -36,17 +36,16 @@ def fold_split(features_path, val_path, test_path):
     train_files = list(set(train_files) - set(test_files + val_files))
     return train_files, val_files, test_files
 
-def run_train(val_path_fold, test_path_fold, features_path_fold, device, results_dir, model_dir, actions_dict,
+def manage_training(val_path_fold, test_path_fold, features_path_fold, device, results_dir, model_dir, actions_dict,
               num_layers_PG, num_layers_R, num_R,
               num_f_maps, num_epochs, bz, lr, features_dim, clogger, kl_flag=False, sample_size=5):
     fold_num = features_path_fold.split("/")[-2]
     print(f"\t{fold_num}")
-    gt_path = '/datashare/APAS/transcriptions_gestures/'
     sample_rate = 1
     num_classes = len(actions_dict)
+    gt_path = '/datashare/APAS/transcriptions_gestures/'
     sample_size_flag = f"Sample size {sample_size}"
     exts = [sample_size_flag] #TODO: add name of the embedding
-    
     folder_name = results_dir.format(fold_num, "_".join(exts))
     model_folder_name = model_dir.format(fold_num, "_".join(exts))
     try:
@@ -129,13 +128,19 @@ if __name__ == '__main__':
     results_dir = "./results/" + str(exp_name) + "/{}/{}"
 
     actions_dict= actions_handler(mapping_file=mapping_file)
+    
 
-
-    print("Starting training!")
+    print("Task training")
+    
     if args.action == "train_tradeoff":
+        sample_sizes=[1, 5, 10, 30, 60]
+    if args.action == "train":
+        sample_sizes=[5]
+    if args.action == "baseline":
+        sample_sizes=[1]
         for val_path_fold, test_path_fold, features_path_fold in fold_srcs:
-            for sample_size in [1, 5, 10, 30, 60]:
-                run_train(val_path_fold=val_path_fold, test_path_fold=test_path_fold,
+            for sample_size in sample_sizes :
+                manage_training(val_path_fold=val_path_fold, test_path_fold=test_path_fold,
                           features_path_fold=features_path_fold, device=device, results_dir=results_dir,
                           model_dir=model_dir,
                           actions_dict=actions_dict,
@@ -144,24 +149,4 @@ if __name__ == '__main__':
                           clogger=clogger, kl_flag=False,
                           sample_size=sample_size)
 
-    if args.action == "train":
-        for val_path_fold, test_path_fold, features_path_fold in fold_srcs:
-            run_train(val_path_fold=val_path_fold, test_path_fold=test_path_fold,
-                      features_path_fold=features_path_fold, device=device, results_dir=results_dir,
-                      model_dir=model_dir,
-                      actions_dict=actions_dict,
-                      num_layers_PG=num_layers_PG, num_layers_R=num_layers_R, num_R=num_R,
-                      num_f_maps=num_f_maps, num_epochs=num_epochs, bz=bz, lr=lr, features_dim=features_dim,
-                      clogger=clogger, kl_flag=False,
-                      sample_size=5)
-
-    if args.action == "baseline":
-        for val_path_fold, test_path_fold, features_path_fold in fold_srcs:
-            run_train(val_path_fold=val_path_fold, test_path_fold=test_path_fold,
-                      features_path_fold=features_path_fold, device=device, results_dir=results_dir,
-                      model_dir=model_dir,
-                      actions_dict=actions_dict,
-                      num_layers_PG=num_layers_PG, num_layers_R=num_layers_R, num_R=num_R,
-                      num_f_maps=num_f_maps, num_epochs=num_epochs, bz=bz, lr=lr, features_dim=features_dim,
-                      clogger=clogger, kl_flag=False,
-                      sample_size=1)
+    

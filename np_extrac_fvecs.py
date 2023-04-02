@@ -1,17 +1,8 @@
-import random
-from glob import glob
-from PIL import Image
 import numpy as np
-import json
-import datetime
-import git
 from tqdm import tqdm
-import os
-import copy
 import os
 import tensorflow as tf
 from tensorflow import keras
-import logging
 
 
 def chose_model(model_type):
@@ -98,6 +89,9 @@ def generate_efficientnet_feature_vectors(ds: str,
     processed_labels = []
     with tqdm(total=len(ds.file_paths) // batch_size) as pbar:
         for idx, (images, image_ids) in enumerate(ds):
+            print('here')
+            if image_ids[0][0]==100:
+                return
             feature_vectors = feature_extractor(images)
             for inner_idx, (single_im_id, f_vec) in enumerate(zip(image_ids, feature_vectors)):
                 video_name = ds.class_names[single_im_id]
@@ -118,12 +112,59 @@ def generate_efficientnet_feature_vectors(ds: str,
 
 def main():
     model_params_dict = {0: 224, 1: 240, 2: 260, 3: 300, 4: 380, 5: 456, 6: 528, 7: 600}
-    folders = ['P016_balloon1_side', 'P016_balloon1_top', 'P016_balloon2_side', 'P016_balloon2_top', 'P016_tissue1_side', 'P016_tissue1_top', 'P016_tissue2_side', 'P016_tissue2_top', 'P017_balloon1_side', 'P017_balloon1_top', 'P017_balloon2_side', 'P017_balloon2_top', 'P017_tissue1_side', 'P017_tissue1_top', 'P017_tissue2_side', 'P017_tissue2_top', 'P018_balloon1_side', 'P018_balloon1_top', 'P018_balloon2_side', 'P018_balloon2_top', 'P018_tissue1_side', 'P018_tissue1_top', 'P018_tissue2_side', 'P018_tissue2_top', 'P019_balloon1_side', 'P019_balloon1_top', 'P019_balloon2_side', 'P019_balloon2_top', 'P019_tissue1_side', 'P019_tissue1_top', 'P019_tissue2_side', 'P019_tissue2_top', 'P020_balloon1_side', 'P020_balloon1_top', 'P020_balloon2_side', 'P020_balloon2_top', 'P020_tissue1_side', 'P020_tissue1_top', 'P020_tissue2_side', 'P020_tissue2_top', 'P021_balloon1_side', 'P021_balloon1_top', 'P021_balloon2_side', 'P021_balloon2_top', 'P021_tissue1_side', 'P021_tissue1_top', 'P021_tissue2_side', 'P021_tissue2_top', 'P022_balloon1_side', 'P022_balloon1_top', 'P022_balloon2_side', 'P022_balloon2_top', 'P022_tissue1_side', 'P022_tissue1_top', 'P022_tissue2_side', 'P022_tissue2_top', 'P023_balloon1_side', 'P023_balloon1_top', 'P023_balloon2_side', 'P023_balloon2_top', 'P023_tissue1_side', 'P023_tissue1_top', 'P023_tissue2_side', 'P023_tissue2_top', 'P024_balloon1_side', 'P024_balloon1_top', 'P024_balloon2_side', 'P024_balloon2_top', 'P024_tissue1_side', 'P024_tissue1_top', 'P024_tissue2_side', 'P024_tissue2_top', 'P025_balloon1_side', 'P025_balloon1_top', 'P025_balloon2_side', 'P025_balloon2_top', 'P025_tissue1_side', 'P025_tissue1_top', 'P025_tissue2_side', 'P025_tissue2_top', 'P026_balloon1_side', 'P026_balloon1_top', 'P026_balloon2_side', 'P026_balloon2_top', 'P026_tissue1_side', 'P026_tissue1_top', 'P026_tissue2_side', 'P026_tissue2_top', 'P027_balloon1_side', 'P027_balloon1_top', 'P027_balloon2_side', 'P027_balloon2_top', 'P027_tissue1_side', 'P027_tissue1_top', 'P027_tissue2_side', 'P027_tissue2_top', 'P028_balloon1_side', 'P028_balloon1_top', 'P028_balloon2_side', 'P028_balloon2_top', 'P028_tissue1_side', 'P028_tissue1_top', 'P028_tissue2_side', 'P028_tissue2_top', 'P029_balloon1_side', 'P029_balloon1_top', 'P029_balloon2_side', 'P029_balloon2_top', 'P029_tissue1_side', 'P029_tissue1_top', 'P029_tissue2_side', 'P029_tissue2_top', 'P030_balloon1_side', 'P030_balloon1_top', 'P030_balloon2_side', 'P030_balloon2_top', 'P030_tissue1_side', 'P030_tissue1_top', 'P030_tissue2_side', 'P030_tissue2_top', 'P031_balloon1_side', 'P031_balloon1_top', 'P031_balloon2_side', 'P031_balloon2_top', 'P031_tissue1_side', 'P031_tissue1_top', 'P031_tissue2_side', 'P031_tissue2_top', 'P032_balloon1_side', 'P032_balloon1_top', 'P032_balloon2_side', 'P032_balloon2_top', 'P032_tissue1_side', 'P032_tissue1_top', 'P032_tissue2_side', 'P032_tissue2_top', 'P033_balloon1_side', 'P033_balloon1_top', 'P033_balloon2_side', 'P033_balloon2_top', 'P033_tissue1_side', 'P033_tissue1_top', 'P033_tissue2_side', 'P033_tissue2_top', 'P034_balloon1_side', 'P034_balloon1_top', 'P034_balloon2_side', 'P034_balloon2_top', 'P034_tissue1_side', 'P034_tissue1_top', 'P034_tissue2_side', 'P034_tissue2_top', 'P035_balloon1_side', 'P035_balloon1_top', 'P035_balloon2_side', 'P035_balloon2_top', 'P035_tissue1_side', 'P035_tissue1_top', 'P035_tissue2_side', 'P035_tissue2_top', 'P036_balloon1_side', 'P036_balloon1_top', 'P036_balloon2_side', 'P036_balloon2_top', 'P036_tissue1_side', 'P036_tissue1_top', 'P036_tissue2_side', 'P036_tissue2_top', 'P037_balloon1_side', 'P037_balloon1_top', 'P037_balloon2_side', 'P037_balloon2_top', 'P037_tissue1_side', 'P037_tissue1_top', 'P037_tissue2_side', 'P037_tissue2_top', 'P038_balloon1_side', 'P038_balloon1_top', 'P038_balloon2_side', 'P038_balloon2_top', 'P038_tissue1_side', 'P038_tissue1_top', 'P038_tissue2_side', 'P038_tissue2_top', 'P039_balloon1_side', 'P039_balloon1_top', 'P039_balloon2_side', 'P039_balloon2_top', 'P039_tissue1_side', 'P039_tissue1_top', 'P039_tissue2_side', 'P039_tissue2_top', 'P040_balloon1_side', 'P040_balloon1_top', 'P040_balloon2_side', 'P040_balloon2_top', 'P040_tissue1_side', 'P040_tissue1_top', 'P040_tissue2_side', 'P040_tissue2_top']
-    classes_not_to_load = []
-    for clas in folders:
-        if 'top' in clas:
-            classes_not_to_load.append(clas)
-    labels_folder_dict = {i: folders[i] for i in range(len(folders))}
+    folders = ['P016_balloon1_side', 'P016_balloon1_top', 'P016_balloon2_side', 'P016_balloon2_top',
+               'P016_tissue1_side', 'P016_tissue1_top', 'P016_tissue2_side', 'P016_tissue2_top', 'P017_balloon1_side',
+               'P017_balloon1_top', 'P017_balloon2_side', 'P017_balloon2_top', 'P017_tissue1_side', 'P017_tissue1_top',
+               'P017_tissue2_side', 'P017_tissue2_top', 'P018_balloon1_side', 'P018_balloon1_top', 'P018_balloon2_side',
+               'P018_balloon2_top', 'P018_tissue1_side', 'P018_tissue1_top', 'P018_tissue2_side', 'P018_tissue2_top',
+               'P019_balloon1_side', 'P019_balloon1_top', 'P019_balloon2_side', 'P019_balloon2_top',
+               'P019_tissue1_side', 'P019_tissue1_top', 'P019_tissue2_side', 'P019_tissue2_top', 'P020_balloon1_side',
+               'P020_balloon1_top', 'P020_balloon2_side', 'P020_balloon2_top', 'P020_tissue1_side', 'P020_tissue1_top',
+               'P020_tissue2_side', 'P020_tissue2_top', 'P021_balloon1_side', 'P021_balloon1_top', 'P021_balloon2_side',
+               'P021_balloon2_top', 'P021_tissue1_side', 'P021_tissue1_top', 'P021_tissue2_side', 'P021_tissue2_top',
+               'P022_balloon1_side', 'P022_balloon1_top', 'P022_balloon2_side', 'P022_balloon2_top',
+               'P022_tissue1_side', 'P022_tissue1_top', 'P022_tissue2_side', 'P022_tissue2_top', 'P023_balloon1_side',
+               'P023_balloon1_top', 'P023_balloon2_side', 'P023_balloon2_top', 'P023_tissue1_side', 'P023_tissue1_top',
+               'P023_tissue2_side', 'P023_tissue2_top', 'P024_balloon1_side', 'P024_balloon1_top', 'P024_balloon2_side',
+               'P024_balloon2_top', 'P024_tissue1_side', 'P024_tissue1_top', 'P024_tissue2_side', 'P024_tissue2_top',
+               'P025_balloon1_side', 'P025_balloon1_top', 'P025_balloon2_side', 'P025_balloon2_top',
+               'P025_tissue1_side', 'P025_tissue1_top', 'P025_tissue2_side', 'P025_tissue2_top', 'P026_balloon1_side',
+               'P026_balloon1_top', 'P026_balloon2_side', 'P026_balloon2_top', 'P026_tissue1_side', 'P026_tissue1_top',
+               'P026_tissue2_side', 'P026_tissue2_top', 'P027_balloon1_side', 'P027_balloon1_top', 'P027_balloon2_side',
+               'P027_balloon2_top', 'P027_tissue1_side', 'P027_tissue1_top', 'P027_tissue2_side', 'P027_tissue2_top',
+               'P028_balloon1_side', 'P028_balloon1_top', 'P028_balloon2_side', 'P028_balloon2_top',
+               'P028_tissue1_side', 'P028_tissue1_top', 'P028_tissue2_side', 'P028_tissue2_top', 'P029_balloon1_side',
+               'P029_balloon1_top', 'P029_balloon2_side', 'P029_balloon2_top', 'P029_tissue1_side', 'P029_tissue1_top',
+               'P029_tissue2_side', 'P029_tissue2_top', 'P030_balloon1_side', 'P030_balloon1_top', 'P030_balloon2_side',
+               'P030_balloon2_top', 'P030_tissue1_side', 'P030_tissue1_top', 'P030_tissue2_side', 'P030_tissue2_top',
+               'P031_balloon1_side', 'P031_balloon1_top', 'P031_balloon2_side', 'P031_balloon2_top',
+               'P031_tissue1_side', 'P031_tissue1_top', 'P031_tissue2_side', 'P031_tissue2_top', 'P032_balloon1_side',
+               'P032_balloon1_top', 'P032_balloon2_side', 'P032_balloon2_top', 'P032_tissue1_side', 'P032_tissue1_top',
+               'P032_tissue2_side', 'P032_tissue2_top', 'P033_balloon1_side', 'P033_balloon1_top', 'P033_balloon2_side',
+               'P033_balloon2_top', 'P033_tissue1_side', 'P033_tissue1_top', 'P033_tissue2_side', 'P033_tissue2_top',
+               'P034_balloon1_side', 'P034_balloon1_top', 'P034_balloon2_side', 'P034_balloon2_top',
+               'P034_tissue1_side', 'P034_tissue1_top', 'P034_tissue2_side', 'P034_tissue2_top', 'P035_balloon1_side',
+               'P035_balloon1_top', 'P035_balloon2_side', 'P035_balloon2_top', 'P035_tissue1_side', 'P035_tissue1_top',
+               'P035_tissue2_side', 'P035_tissue2_top', 'P036_balloon1_side', 'P036_balloon1_top', 'P036_balloon2_side',
+               'P036_balloon2_top', 'P036_tissue1_side', 'P036_tissue1_top', 'P036_tissue2_side', 'P036_tissue2_top',
+               'P037_balloon1_side', 'P037_balloon1_top', 'P037_balloon2_side', 'P037_balloon2_top',
+               'P037_tissue1_side', 'P037_tissue1_top', 'P037_tissue2_side', 'P037_tissue2_top', 'P038_balloon1_side',
+               'P038_balloon1_top', 'P038_balloon2_side', 'P038_balloon2_top', 'P038_tissue1_side', 'P038_tissue1_top',
+               'P038_tissue2_side', 'P038_tissue2_top', 'P039_balloon1_side', 'P039_balloon1_top', 'P039_balloon2_side',
+               'P039_balloon2_top', 'P039_tissue1_side', 'P039_tissue1_top', 'P039_tissue2_side', 'P039_tissue2_top',
+               'P040_balloon1_side', 'P040_balloon1_top', 'P040_balloon2_side', 'P040_balloon2_top',
+               'P040_tissue1_side', 'P040_tissue1_top', 'P040_tissue2_side', 'P040_tissue2_top']
+    side_folders = []
+    up_folders = []
+    for fo in folders:
+        if 'side' in fo:
+            side_folders.append(fo)
+        elif 'top' in fo:
+            up_folders.append(fo)
+    ordered_folders = side_folders + up_folders
+    classes_index_not_to_load = []
+
+    labels_folder_dict = {i: folders[i] for i in range(len(ordered_folders))}
 
     db_address = '/datashare/APAS/frames/'
     # db_address = '/home/user/datasets/frames'
@@ -132,7 +173,7 @@ def main():
     for model_index, model_input_size in model_params_dict.items():
         if model_index == 0:
             print(f"Starting model: {model_index}")
-            ds = tf.keras.utils.image_dataset_from_directory(
+            ds = tf.keras.preprocessing.image_dataset_from_directory(
                 db_address,
                 seed=seed,
                 labels='inferred',
@@ -140,8 +181,7 @@ def main():
                 class_names=list(labels_folder_dict.values()),
                 shuffle=False,
                 image_size=(model_input_size, model_input_size),
-                batch_size=batch_size,
-                exclude=classes_not_to_load)
+                batch_size=batch_size)
 
             dest_path = f'{os.getcwd()}/efficientnet/B_exclude{model_index}'
             os.makedirs(dest_path, exist_ok=True)
@@ -150,8 +190,10 @@ def main():
                                                   labels_folder_dict=labels_folder_dict,
                                                   model_index=model_index,
                                                   model_input_size=model_input_size,
-                                                  batch_size=batch_size)
+                                                  batch_size=batch_size,
+                                                  label_to_exclude=classes_index_not_to_load)
 
 
 if __name__ == '__main__':
+    print("updated 3")
     main()

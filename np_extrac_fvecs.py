@@ -90,7 +90,8 @@ def generate_efficientnet_feature_vectors(ds: str,
     with tqdm(total=len(ds.file_paths) // batch_size) as pbar:
         for idx, (images, image_ids) in enumerate(ds):
             print('here')
-            if image_ids[0][0] == 100:
+            print(image_ids[-1])
+            if image_ids[-1] == 100:
                 return
             feature_vectors = feature_extractor(images)
             for inner_idx, (single_im_id, f_vec) in enumerate(zip(image_ids, feature_vectors)):
@@ -194,5 +195,5 @@ def main():
 
 
 if __name__ == '__main__':
-    print("updated 4")
+    print("updated 5")
     main()

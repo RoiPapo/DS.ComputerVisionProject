@@ -135,7 +135,7 @@ class DilatedResidualLayer(nn.Module):
 
 
 class Trainer:
-    def __init__(self, num_layers_PG, num_layers_R, num_R, num_f_maps, dim, num_classes, dataset, split, kl=False,  sample_size=5):
+    def __init__(self, num_layers_PG, num_layers_R, num_R, num_f_maps, dim, num_classes, dataset, split,sc, kl=False,  sample_size=5):
       
         self.model = MS_TCN2(num_layers_PG, num_layers_R, num_R, num_f_maps, dim, num_classes)
         self.ce = nn.CrossEntropyLoss(ignore_index=-100)
@@ -143,10 +143,11 @@ class Trainer:
         self.num_classes = num_classes
         self.fold = split
         self.kl = kl
+        self.sc=sc
         self.kl_str = "KL" if self.kl else "NoKL"
         self.sample_size = sample_size
         self.sample_size_str = f"SampleSize{sample_size}"
-        ext = [self.sample_size_str] #TODO:  add botleneckName
+        ext = [self.sample_size_str,"bottle neck B"] #TODO:  add botleneckName
         self.exp_name = "-".join(ext)
         self.overlap = [.1, .25, .5]
         logger.add('logs/' + dataset + "_" + split + "_{time}.log")
@@ -164,24 +165,24 @@ class Trainer:
                               value=(float(correct_train) / total_train))
         clogger.report_scalar(self.exp_name + " Accuracies - " + self.fold, "Validation Accuracy",
                               iteration=epoch + 1,
-                              value=(float(correct_val) / total_val))
+                              value=(float(correct_val) / total_val)*self.sc)
         clogger.report_scalar("Validation Accuracies - " + self.fold, f"{self.sample_size} sample rate",
                               iteration=epoch + 1,
-                              value=(float(correct_val) / total_val))
+                              value=(float(correct_val) / total_val)*self.sc)
         clogger.report_scalar("Validation Edit Score - " + self.fold, f"{self.sample_size} sample rate",
                               iteration=epoch + 1,
                               value=np.mean(edit_score_val))
         clogger.report_scalar("Train Edit Score - " + self.fold, f"{self.sample_size} sample rate",
                               iteration=epoch + 1,
-                              value=np.mean(edit_score_train))
+                              value=np.mean(edit_score_train)*self.sc)
         for k in range(len(self.overlap)):
             clogger.report_scalar(self.exp_name + " F1 Validation - " + self.fold,
                                   f"F1@{int(self.overlap[k] * 100)}",
                                   iteration=epoch + 1,
-                                  value=(float(f1s_val[k]) / len(batch_gen_val.list_of_examples)))
+                                  value=(float(f1s_val[k])*self.sc / len(batch_gen_val.list_of_examples)))
             clogger.report_scalar(self.exp_name + " F1 Train - " + self.fold, f"F1@{int(self.overlap[k] * 100)}",
                                   iteration=epoch + 1,
-                                  value=(float(f1s_train[k]) / len(batch_gen_train.list_of_examples)))
+                                  value=(float(f1s_train[k])*self.sc / len(batch_gen_train.list_of_examples)))
 
     def train(self, save_dir, batch_gen_train, batch_gen_val, num_epochs, batch_size, learning_rate, device, clogger):
         self.model.train()

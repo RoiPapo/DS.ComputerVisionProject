@@ -8,7 +8,7 @@ import torchvision.transforms as transforms
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
-efficientnet = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True)
+
 relevant_folders = ['P016_balloon1_side', 'P016_balloon2_side', 'P016_tissue1_side', 'P016_tissue2_side',
                     'P017_balloon1_side', 'P017_balloon2_side', 'P017_tissue1_side', 'P017_tissue2_side',
                     'P018_balloon1_side', 'P018_balloon2_side', 'P018_tissue1_side', 'P018_tissue2_side',
@@ -55,10 +55,10 @@ class ImageDataset(data.Dataset):
     def __init__(self, root):
         self.root = root
         self.transform = transforms.Compose([
-            transforms.Resize(256),
+            transforms.Resize(224),
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225])
+            transforms.Normalize(mean=[152.33031877955463, 106.26509461301819, 104.55854576464021],
+                                 std=[36.21155284418057, 30.75150171154211, 31.2230456008511])
         ])
         self.samples = []
         for filename in sorted(os.listdir(root)):
@@ -73,15 +73,16 @@ class ImageDataset(data.Dataset):
     def __len__(self):
         return len(self.samples)
 
+
 def extract_folder(folder):
     # P016_balloon1_side
     # Load data and create dataloader
-    data_folder = f'/home/user/datasets/frames/{folder}'
+    data_folder = f'/datashare/APAS/frames/{folder}'
     # data_folder = f'/home/user/datasets/frames/{folder}'
-    dest_path = f'{os.getcwd()}/efficientnet/B_exclude{0}'
+    dest_path = f'{os.getcwd()}/efficientnet/B{0}'
 
     dataset = ImageDataset(data_folder)
-    dataloader = data.DataLoader(dataset, batch_size=32, shuffle=False)
+    dataloader = data.DataLoader(dataset, batch_size=256, shuffle=False)
 
     # Create feature extractor and move to device
     feature_extractor = EfficientNetFeatureExtractor()
@@ -104,5 +105,17 @@ def extract_folder(folder):
     # np.save('labels.npy', labels)
 
 
+def extract_features():
+    for model_num in range(8):
+        try:
+            efficientnet = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub',
+                                          f'nvidia_efficientnet_b{model_num}',
+                                          pretrained=True)
+        except:
+            print(f'failed {model_num}')
+        # for folder_vid in relevant_folders:
+        #     extract_folder(folder_vid)
+
+
 if __name__ == '__main__':
-    extract_folder('P016_balloon1_side')
+    extract_features()

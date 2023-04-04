@@ -3,9 +3,6 @@ from tqdm import tqdm
 import os
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.python.framework.ops import disable_eager_execution
-
-disable_eager_execution()
 
 
 def chose_model(model_type):
@@ -73,7 +70,6 @@ def generate_ds(files, batch_size, original_height, original_width):
 
 def generate_efficientnet_feature_vectors(ds: str,
                                           dest_path: str,
-                                          labels_folder_dict,
                                           model_index,
                                           model_input_size,
                                           batch_size):
@@ -87,65 +83,38 @@ def generate_efficientnet_feature_vectors(ds: str,
       :return: None
       """
 
-    # feature_extractor = build_model_EfficientNet(model_index, model_input_size=model_input_size)
-    # out_feature_vectors = None
-    # processed_labels = []
-    # with tqdm(total=len(ds.file_paths) // batch_size) as pbar:
-    #     for idx, (images, image_ids) in enumerate(ds):
-    #         if image_ids[-1].numpy() == 100:
-    #             return
-    #         feature_vectors = feature_extractor(images)
-    #         for inner_idx, (single_im_id, f_vec) in enumerate(zip(image_ids, feature_vectors)):
-    #             video_name = ds.class_names[single_im_id]
-    #             frame_name = ds.file_paths[idx * batch_size + inner_idx].split('/')[-1]
-    #             if video_name not in processed_labels:
-    #                 if out_feature_vectors is not None:
-    #                     np.save(f'{dest_path}/{video_name}.npy', out_feature_vectors.T)
-    #                 out_feature_vectors = f_vec.numpy()
-    #                 processed_labels.append(video_name)
-    #
-    #             else:
-    #                 out_feature_vectors = np.vstack([out_feature_vectors, f_vec.numpy()])
-    #
-    #         pbar.update(1)
-    #
-    #     np.save(f'{dest_path}/{video_name}.npy', out_feature_vectors.T)
-
     feature_extractor = build_model_EfficientNet(model_index, model_input_size=model_input_size)
     out_feature_vectors = None
     processed_labels = []
-    iterator = tf.compat.v1.data.make_one_shot_iterator(ds)
-    idx = 0
-    with tqdm(total=len(ds.file_paths) // batch_size) as pbar:
-        with tf.compat.v1.Session() as sess:
-            while True:
-                try:
-                    batch = sess.run(iterator.get_next())
-                    print(batch)
-                    images, image_ids = batch
-                    if image_ids[-1] == 100:
-                        return
-                    feature_vectors = feature_extractor(images)
-                    for inner_idx, (single_im_id, f_vec) in enumerate(zip(image_ids, feature_vectors)):
-                        video_name = ds.class_names[single_im_id]
-                        frame_name = ds.file_paths[idx * batch_size + inner_idx].split('/')[-1]
-                        if video_name not in processed_labels:
-                            if out_feature_vectors is not None:
-                                np.save(f'{dest_path}/{video_name}.npy', out_feature_vectors.T)
-                            out_feature_vectors = f_vec.numpy()
-                            processed_labels.append(video_name)
+    with tqdm(total=len(ds.file_paths) // batch_size, desc=f'Extracting features: B{model_index}') as pbar:
+        for idx, (images, image_ids) in enumerate(ds):
+            feature_vectors = feature_extractor(images)
+            for inner_idx, (single_im_id, f_vec) in enumerate(zip(image_ids, feature_vectors)):
+                video_name = ds.class_names[single_im_id]
+                frame_name = ds.file_paths[idx * batch_size + inner_idx].split('/')[-1]
+                if video_name not in processed_labels:
+                    if out_feature_vectors is not None:
+                        np.save(f'{dest_path}/{video_name}.npy', out_feature_vectors.T)
+                    out_feature_vectors = f_vec.numpy()
+                    processed_labels.append(video_name)
+                else:
+                    out_feature_vectors = np.vstack([out_feature_vectors, f_vec.numpy()])
 
-                        else:
-                            out_feature_vectors = np.vstack([out_feature_vectors, f_vec.numpy()])
+            pbar.update(1)
 
-                    pbar.update(1)
-                    idx += 1
-                except tf.errors.OutOfRangeError:
-                    break
+        np.save(f'{dest_path}/{video_name}.npy', out_feature_vectors.T)
 
 
-def main():
+def extract_features(db_address, batch_size, seed, dest_path):
+    """
+    :param db_address: address of the original frames, assuming that each folder contains frames of a video
+    :param batch_size: batch size
+    :param seed: seed
+    :param dest_path: address for the feature extraction
+    :return: None
+    """
     model_params_dict = {0: 224, 1: 240, 2: 260, 3: 300, 4: 380, 5: 456, 6: 528, 7: 600}
+    # folders is a list which contains each of the subdirectories (each of the videos names) in db_address
     folders = ['P016_balloon1_side', 'P016_balloon1_top', 'P016_balloon2_side', 'P016_balloon2_top',
                'P016_tissue1_side', 'P016_tissue1_top', 'P016_tissue2_side', 'P016_tissue2_top', 'P017_balloon1_side',
                'P017_balloon1_top', 'P017_balloon2_side', 'P017_balloon2_top', 'P017_tissue1_side', 'P017_tissue1_top',
@@ -188,50 +157,54 @@ def main():
                'P039_balloon2_top', 'P039_tissue1_side', 'P039_tissue1_top', 'P039_tissue2_side', 'P039_tissue2_top',
                'P040_balloon1_side', 'P040_balloon1_top', 'P040_balloon2_side', 'P040_balloon2_top',
                'P040_tissue1_side', 'P040_tissue1_top', 'P040_tissue2_side', 'P040_tissue2_top']
-    # folders = ['P016_balloon1_side', 'P016_balloon1_top', 'P016_balloon2_side', 'P016_balloon2_top']
+    folders = ['P016_balloon1_side', 'P016_balloon1_top', 'P016_balloon2_side', 'P016_balloon2_top']
 
     side_folders = []
     up_folders = []
+    # first processing the side videos and then the ip videos
     for fo in folders:
         if 'side' in fo:
             side_folders.append(fo)
         elif 'top' in fo:
             up_folders.append(fo)
 
-    print(side_folders)
-    exit()
     ordered_folders = side_folders + up_folders
-    classes_index_not_to_load = []
 
     labels_folder_dict = {i: folders[i] for i in range(len(ordered_folders))}
 
+    for model_index, model_input_size in model_params_dict.items():
+        print(f"Starting extracting feature for efficientnet B: {model_index}")
+        print('Loading ds:')
+        ds = tf.keras.preprocessing.image_dataset_from_directory(
+            db_address,
+            seed=seed,
+            labels='inferred',
+            label_mode='int',
+            class_names=list(labels_folder_dict.values()),
+            shuffle=False,
+            image_size=(model_input_size, model_input_size),
+            batch_size=batch_size)
+
+        os.makedirs(f'{dest_path}/efficientnet/B{model_index}', exist_ok=True)
+        generate_efficientnet_feature_vectors(ds=ds,
+                                              dest_path=f'{dest_path}/efficientnet/B{model_index}',
+                                              model_index=model_index,
+                                              model_input_size=model_input_size,
+                                              batch_size=batch_size)
+
+
+def main():
+    # current folder of the frames (assuming decided into folders where each folder contains a video)
     # db_address = '/datashare/APAS/frames/'
+    dest_path = '/home/user/test'
     db_address = '/home/user/datasets/frames'
     batch_size = 256
     seed = 100
-    for model_index, model_input_size in model_params_dict.items():
-        if model_index == 0:
-            print(f"Starting model: {model_index}")
-            ds = tf.keras.preprocessing.image_dataset_from_directory(
-                db_address,
-                seed=seed,
-                labels='inferred',
-                label_mode='int',
-                class_names=list(labels_folder_dict.values()),
-                shuffle=False,
-                image_size=(model_input_size, model_input_size),
-                batch_size=batch_size)
-
-            dest_path = f'{os.getcwd()}/efficientnet/B_exclude{model_index}'
-            os.makedirs(dest_path, exist_ok=True)
-            generate_efficientnet_feature_vectors(ds=ds,
-                                                  dest_path=dest_path,
-                                                  labels_folder_dict=labels_folder_dict,
-                                                  model_index=model_index,
-                                                  model_input_size=model_input_size,
-                                                  batch_size=batch_size)
+    extract_features(db_address=db_address,
+                     batch_size=batch_size,
+                     seed=seed,
+                     dest_path=dest_path)
 
 
 if __name__ == '__main__':
-    print("updated 5")
     main()

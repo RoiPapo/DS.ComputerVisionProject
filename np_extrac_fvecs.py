@@ -100,7 +100,7 @@ def extract_folder(feature_extractor, folder, data_folder, dest_path, batch_size
     # np.save('labels.npy', labels)
 
 
-def extract_features(db_address, batch_size, seed, dest_path):
+def extract_features(db_address, batch_size, dest_path):
     for model_num in range(8):
         model = EfficientNet.from_pretrained(f'efficientnet-b{model_num}')
         for folder_vid in relevant_folders:

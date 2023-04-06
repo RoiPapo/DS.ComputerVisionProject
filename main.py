@@ -112,11 +112,10 @@ if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     args = args_handler()
     # current folder of the frames (assuming decided into folders where each folder contains a video)
-    # db_address = '/datashare/APAS/frames/'
-    # dest_path = '/home/student/computer_vision/DS.ComputerVisionProject/f_vecs'
-    dest_path = '/home/user/test'
-    # db_address = '/datashare/APAS/frames'
-    db_address = '/home/user/datasets/frames'
+    db_address = '/datashare/APAS/frames/'
+    dest_path = '/home/student/computer_vision/DS.ComputerVisionProject/f_vecs'
+    # dest_path = '/home/user/test'
+    # db_address = '/home/user/datasets/frames'
     flag_do_you_want_extract = True
     if flag_do_you_want_extract:
         extract_features(db_address=db_address,

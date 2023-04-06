@@ -8,6 +8,7 @@ import torchvision.transforms as transforms
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
+from efficientnet_pytorch import EfficientNet
 
 relevant_folders = ['P016_balloon1_side', 'P016_balloon2_side', 'P016_tissue1_side', 'P016_tissue2_side',
                     'P017_balloon1_side', 'P017_balloon2_side', 'P017_tissue1_side', 'P017_tissue2_side',
@@ -74,18 +75,11 @@ class ImageDataset(data.Dataset):
         return len(self.samples)
 
 
-def extract_folder(folder):
-    # P016_balloon1_side
-    # Load data and create dataloader
-    data_folder = f'/datashare/APAS/frames/{folder}'
-    # data_folder = f'/home/user/datasets/frames/{folder}'
-    dest_path = f'{os.getcwd()}/efficientnet/B{0}'
-
+def extract_folder(feature_extractor, folder, data_folder, dest_path, batch_size):
     dataset = ImageDataset(data_folder)
-    dataloader = data.DataLoader(dataset, batch_size=256, shuffle=False)
+    dataloader = data.DataLoader(dataset, batch_size=batch_size, shuffle=False)
 
     # Create feature extractor and move to device
-    feature_extractor = EfficientNetFeatureExtractor()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     feature_extractor.to(device)
 
@@ -101,21 +95,35 @@ def extract_folder(folder):
             labels.append(batch_labels.numpy())
     features = np.concatenate(features, axis=0)
     labels = np.concatenate(labels, axis=0)
+    os.makedirs(dest_path, exist_ok=True)
     np.save(f'{dest_path}/{folder}.npy', features)
     # np.save('labels.npy', labels)
 
 
-def extract_features():
+def extract_features(db_address, batch_size, seed, dest_path):
     for model_num in range(8):
-        try:
-            efficientnet = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub',
-                                          f'nvidia_efficientnet_b{model_num}',
-                                          pretrained=True)
-        except:
-            print(f'failed {model_num}')
-        # for folder_vid in relevant_folders:
-        #     extract_folder(folder_vid)
+        model = EfficientNet.from_pretrained(f'efficientnet-b{model_num}')
+        for folder_vid in relevant_folders:
+            print(f'Extracting features for efficientnet b{model_num}')
+            extract_folder(feature_extractor=model,
+                           folder=folder_vid,
+                           data_folder=f'{db_address}/{folder_vid}',
+                           dest_path=f'{dest_path}/efficientnet/b{model_num}',
+                           batch_size=24)
+
+
+def main():
+    db_address = f'/home/user/datasets/frames'
+
+    # data_folder = f'/datashare/APAS/frames'
+
+    dest_path = f'/home/user/test'
+
+    extract_features(db_address=db_address,
+                     batch_size=24,
+                     seed=100,
+                     dest_path=dest_path)
 
 
 if __name__ == '__main__':
-    extract_features()
+    main()

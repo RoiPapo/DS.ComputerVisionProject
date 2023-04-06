@@ -113,11 +113,11 @@ def extract_features(db_address, batch_size, seed, dest_path):
 
 
 def main():
-    db_address = f'/home/user/datasets/frames'
+    # db_address = f'/home/user/datasets/frames'
 
-    # data_folder = f'/datashare/APAS/frames'
+    db_address = f'/datashare/APAS/frames'
 
-    dest_path = f'/home/user/test'
+    dest_path = f'.'
 
     extract_features(db_address=db_address,
                      batch_size=24,

@@ -147,7 +147,7 @@ class Trainer:
         self.kl_str = "KL" if self.kl else "NoKL"
         self.sample_size = sample_size
         self.sample_size_str = f"SampleSize{sample_size}"
-        ext = [self.sample_size_str,"bottle neck B"] #TODO:  add botleneckName
+        ext = [self.sample_size_str,"bottle neck 0"] #TODO:  add botleneckName
         self.exp_name = "-".join(ext)
         self.overlap = [.1, .25, .5]
         logger.add('logs/' + dataset + "_" + split + "_{time}.log")

@@ -45,7 +45,7 @@ def manage_training(val_path_fold, test_path_fold, features_path_fold, device, r
     num_classes = len(actions_dict)
     gt_path = '/datashare/APAS/transcriptions_gestures/'
     sample_size_flag = f"Sample size {sample_size}"
-    exts = [sample_size_flag, "EfficienetB6"] #TODO: add name of the embedding
+    exts = [sample_size_flag, "EfficienetB0"] #TODO: add name of the embedding
     folder_name = results_dir.format(fold_num, "_".join(exts))
     model_folder_name = model_dir.format(fold_num, "_".join(exts))
     try:
@@ -115,7 +115,7 @@ if __name__ == '__main__':
     num_layers_R = args.num_layers_R
     num_R = args.num_R
     num_f_maps = args.num_f_maps
-    fvec_name= "Efficient6"
+    fvec_name= "Efficient0"
     exp_name = f"try Fvecs: {fvec_name}"
     clogger = ClearMl_integration(args.action,exp_name)
     fold_srcs=[]

@@ -194,18 +194,18 @@ def extract_features(db_address, batch_size, dest_path):
                                               batch_size=batch_size)
 
 
-# def main():
-#     # current folder of the frames (assuming decided into folders where each folder contains a video)
-#     # db_address = '/datashare/APAS/frames/'
-#     dest_path = '/home/user/test'
-#     db_address = '/home/user/datasets/frames'
-#     batch_size = 256
-#     seed = 100
-#     extract_features(db_address=db_address,
-#                      batch_size=batch_size,
-#                      seed=seed,
-#                      dest_path=dest_path)
+def main():
+    # current folder of the frames (assuming decided into folders where each folder contains a video)
+    # dest_path = '/home/user/test'
+    # db_address = '/home/user/datasets/frames'
+    db_address = '/datashare/APAS/frames/'
+    dest_path = '/home/student/computer_vision/DS.ComputerVisionProject/f_vecs'
+
+    batch_size = 256
+    extract_features(db_address=db_address,
+                     batch_size=batch_size,
+                     dest_path=dest_path)
 
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()

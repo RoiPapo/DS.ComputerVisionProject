@@ -9,7 +9,7 @@ import random
 from os import listdir
 from os.path import isfile, join
 import numpy as np
-
+from np_extrac_fvecs import *
 
 def ClearMl_integration(mode,expname):
     if mode == "baseline":
@@ -104,8 +104,18 @@ def actions_handler(mapping_file):
     return actions_dict
 
 if __name__ == '__main__':
+    set_seeds()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     args = args_handler()
+    # current folder of the frames (assuming decided into folders where each folder contains a video)
+    # db_address = '/datashare/APAS/frames/'
+    dest_path = '/home/student/computer_vision/DS.ComputerVisionProject/f_vecs'
+    db_address = '/datashare/APAS/frames'
+    flag_do_you_want_extract= True
+    if flag_do_you_want_extract:
+        extract_features(db_address=db_address,
+                        batch_size=24,
+                        dest_path=dest_path)
     num_epochs = 15
     features_dim = args.features_dim
     bz = args.bz

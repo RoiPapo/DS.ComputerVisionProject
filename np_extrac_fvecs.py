@@ -105,7 +105,7 @@ def generate_efficientnet_feature_vectors(ds: str,
         np.save(f'{dest_path}/{video_name}.npy', out_feature_vectors.T)
 
 
-def extract_features(db_address, batch_size, seed, dest_path):
+def extract_features(db_address, batch_size, dest_path):
     """
     :param db_address: address of the original frames, assuming that each folder contains frames of a video
     :param batch_size: batch size
@@ -113,6 +113,7 @@ def extract_features(db_address, batch_size, seed, dest_path):
     :param dest_path: address for the feature extraction
     :return: None
     """
+   
     model_params_dict = {0: 224, 1: 240, 2: 260, 3: 300, 4: 380, 5: 456, 6: 528, 7: 600}
     # folders is a list which contains each of the subdirectories (each of the videos names) in db_address
     folders = ['P016_balloon1_side', 'P016_balloon1_top', 'P016_balloon2_side', 'P016_balloon2_top',
@@ -157,7 +158,7 @@ def extract_features(db_address, batch_size, seed, dest_path):
                'P039_balloon2_top', 'P039_tissue1_side', 'P039_tissue1_top', 'P039_tissue2_side', 'P039_tissue2_top',
                'P040_balloon1_side', 'P040_balloon1_top', 'P040_balloon2_side', 'P040_balloon2_top',
                'P040_tissue1_side', 'P040_tissue1_top', 'P040_tissue2_side', 'P040_tissue2_top']
-    folders = ['P016_balloon1_side', 'P016_balloon1_top', 'P016_balloon2_side', 'P016_balloon2_top']
+    # folders = ['P016_balloon1_side', 'P016_balloon1_top', 'P016_balloon2_side', 'P016_balloon2_top']
 
     side_folders = []
     up_folders = []
@@ -177,7 +178,7 @@ def extract_features(db_address, batch_size, seed, dest_path):
         print('Loading ds:')
         ds = tf.keras.preprocessing.image_dataset_from_directory(
             db_address,
-            seed=seed,
+            seed=124,
             labels='inferred',
             label_mode='int',
             class_names=list(labels_folder_dict.values()),
@@ -193,18 +194,18 @@ def extract_features(db_address, batch_size, seed, dest_path):
                                               batch_size=batch_size)
 
 
-def main():
-    # current folder of the frames (assuming decided into folders where each folder contains a video)
-    # db_address = '/datashare/APAS/frames/'
-    dest_path = '/home/user/test'
-    db_address = '/home/user/datasets/frames'
-    batch_size = 256
-    seed = 100
-    extract_features(db_address=db_address,
-                     batch_size=batch_size,
-                     seed=seed,
-                     dest_path=dest_path)
+# def main():
+#     # current folder of the frames (assuming decided into folders where each folder contains a video)
+#     # db_address = '/datashare/APAS/frames/'
+#     dest_path = '/home/user/test'
+#     db_address = '/home/user/datasets/frames'
+#     batch_size = 256
+#     seed = 100
+#     extract_features(db_address=db_address,
+#                      batch_size=batch_size,
+#                      seed=seed,
+#                      dest_path=dest_path)
 
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()

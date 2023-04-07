@@ -85,6 +85,7 @@ def main():
                 "Lay the knot": "G4",
                 "Cut the suture": "G5"}
     gestures = {v: k for k, v in gestures.items()}
+    os.makedirs('LabeledVideos', exist_ok=True)
 
     for vid in vids:
         image_folder = f'/datashare/APAS/frames/{vid}_side'

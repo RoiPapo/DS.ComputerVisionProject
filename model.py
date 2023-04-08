@@ -165,24 +165,24 @@ class Trainer:
                               value=(float(correct_train) / total_train))
         clogger.report_scalar(self.exp_name + " Accuracies - " + self.fold, "Validation Accuracy",
                               iteration=epoch + 1,
-                              value=(float(correct_val) / total_val)*self.sc)
+                              value=(float(correct_val) / total_val))
         clogger.report_scalar("Validation Accuracies - " + self.fold, f"{self.sample_size} sample rate",
                               iteration=epoch + 1,
-                              value=(float(correct_val) / total_val)*self.sc)
+                              value=(float(correct_val) / total_val))
         clogger.report_scalar("Validation Edit Score - " + self.fold, f"{self.sample_size} sample rate",
                               iteration=epoch + 1,
                               value=np.mean(edit_score_val))
         clogger.report_scalar("Train Edit Score - " + self.fold, f"{self.sample_size} sample rate",
                               iteration=epoch + 1,
-                              value=np.mean(edit_score_train)*self.sc)
+                              value=np.mean(edit_score_train))
         for k in range(len(self.overlap)):
             clogger.report_scalar(self.exp_name + " F1 Validation - " + self.fold,
                                   f"F1@{int(self.overlap[k] * 100)}",
                                   iteration=epoch + 1,
-                                  value=(float(f1s_val[k])*self.sc / len(batch_gen_val.list_of_examples)))
+                                  value=(float(f1s_val[k]) / len(batch_gen_val.list_of_examples)))
             clogger.report_scalar(self.exp_name + " F1 Train - " + self.fold, f"F1@{int(self.overlap[k] * 100)}",
                                   iteration=epoch + 1,
-                                  value=(float(f1s_train[k])*self.sc / len(batch_gen_train.list_of_examples)))
+                                  value=(float(f1s_train[k]) / len(batch_gen_train.list_of_examples)))
 
     def train(self, save_dir, batch_gen_train, batch_gen_val, num_epochs, batch_size, learning_rate, device, clogger):
         self.model.train()
